@@ -8,7 +8,7 @@ const tripsList = async(req, res) => {
     .find({'code' : req.params.tripCode}) //return single record 
     .exec();
 
-    console.log(q);
+    //console.log(q);
 
   if(!q)
   {//Database return no data
