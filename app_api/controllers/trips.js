@@ -1,29 +1,98 @@
 const mongoose = require('mongoose');
-const Trip = require('../models/travlr'); //Register model
+const Trip = require('../models/travlr');
 const Model = mongoose.model('trips');
 
-// Get: /trips - list of all trips
-const tripsList = async(req, res) => {
-  const q = await Model
-    .find({'code' : req.params.tripCode}) //return single record 
-    .exec();
+// List Trips
+const tripsList = async (req, res) => {
+  const q = await Model.find({}).exec();
 
-    //console.log(q);
-
-  if(!q)
-  {//Database return no data
-    return res
-      .status(404)
-      .json(err);
+  if (!q) {
+    
+    return res.status(404).json(err);
+  } else {
+    return res.status(200).json(q);
   }
-  else{ // Return resulting trip list 
-    return res
-      .status(200)
-      .json(q);
-  } 
 };
 
+//Find Trip
+const tripsFindByCode = async (req, res) => {
+  const q = await Model.find({ 'code' : req.params.tripCode }).exec();
+
+  if (!q) {
+    
+    return res.status(404).json(err);
+  } else {
+    return res.status(200).json(q);
+  }
+};
+
+//Adds trip
+const tripsAddTrip = async(req, res) => {
+  const newTrip = new Trip ({
+    code: req.body.code,
+    name: req.body.name,
+    length: req.body.length,
+    start: req.body.start,
+    resort: req.body.resort,
+    perPerson: req.body.perPerson,
+    image: req.body.image,
+    description: req.body.description
+  });
+
+  const q = await newTrip.save();
+
+    if (!q)
+    {
+      return res
+        .status(400)
+        .json(err);
+    } else {
+      return res
+        .status(201)
+        .json(q);
+
+    }
+};
+
+//Updates Trip
+const tripsUpdateTrip = async(req, res) => {
+  const q = await Model         
+  .findOneAndUpdate(             
+    { 'code' : req.params.tripCode },             
+    {                 
+      code: req.body.code,                 
+      name: req.body.name,                 
+      length: req.body.length,                 
+      start: req.body.start,                 
+      resort: req.body.resort,                 
+      perPerson: req.body.perPerson,                 
+      image: req.body.image,                 
+      description: req.body.description             
+    }          
+  )         
+  .exec();
+
+  if(!q)         
+    { // Database returned no data             
+      return res                 
+      .status(400)                 
+      .json(err);
+
+  } else { // Return resulting updated trip             
+    return res                 
+    .status(201)                 
+    .json(q);         
+  }                             
+  
+  // Uncomment the following line to show results of operation         
+  // on the console         
+  // console.log(q); 
+};
+
+//Export AFTER both are defined
 module.exports = {
-  tripsList, 
-  tripsFindByCode
+  tripsList,
+  tripsFindByCode,
+  tripsAddTrip,
+  tripsUpdateTrip
 };
